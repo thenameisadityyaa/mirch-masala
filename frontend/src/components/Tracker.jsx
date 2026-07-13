@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { MapPin, Search, Clock, CheckCircle, ChefHat } from 'lucide-react';
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api';
+import { API_URL } from '../config';
 
 const STEPS = [
   { key: 'Accepted', label: 'Order Accepted', icon: <CheckCircle size={22} /> },

@@ -8,7 +8,7 @@ import FAQ from './FAQ';
 import Footer from './Footer';
 import { menuItems } from '../data/menuItems';
 
-const API_URL = 'http://localhost:5000/api';
+import { API_URL } from '../config';
 
 const isVeg = (cat) => {
   if (['Soup (Non Veg)', 'Pakoda (Non Veg)'].includes(cat)) return 'nonveg';

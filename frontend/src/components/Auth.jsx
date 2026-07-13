@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { LogIn, UserPlus } from 'lucide-react';
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api';
+import { API_URL } from '../config';
 
 const Auth = ({ type, setUser }) => {
   const [formData, setFormData] = useState({ name: '', email: '', password: '' });
