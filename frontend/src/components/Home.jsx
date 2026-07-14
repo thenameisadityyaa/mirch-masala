@@ -1,13 +1,16 @@
 import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ShoppingBag, Flame, Zap, MapPin, ShieldCheck } from 'lucide-react';
+import { ShoppingBag, Flame, Zap, MapPin, ShieldCheck, Star } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Testimonials from './Testimonials';
 import FAQ from './FAQ';
 import Footer from './Footer';
+import StarRating from './StarRating';
+import ReviewModal from './ReviewModal';
 import { menuItems } from '../data/menuItems';
 import { useCart } from '../context/CartContext';
+import { useRatings, useMyReviews } from '../hooks/useRatings';
 
 const isVeg = (cat) => {
   if (['Soup (Non Veg)', 'Pakoda (Non Veg)'].includes(cat)) return 'nonveg';
@@ -25,8 +28,11 @@ const WHY_ITEMS = [
 const Home = () => {
   const navigate = useNavigate();
   const { addItem, openCart } = useCart();
+  const { ratings }           = useRatings();
+  const { myReviews, setMyReviews } = useMyReviews();
   const [activeCategory, setActiveCategory] = useState('All');
-  const [search, setSearch] = useState('');
+  const [search,          setSearch]        = useState('');
+  const [reviewItem,      setReviewItem]    = useState(null); // item to review
 
   const categories = ['All', ...new Set(menuItems.map(item => item.category))];
 
@@ -48,8 +54,22 @@ const Home = () => {
     openCart();
   }, [addItem, openCart, navigate]);
 
+  const handleReviewSaved = (review) => {
+    setMyReviews(prev => ({ ...prev, [review.itemId]: review }));
+  };
+
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+
+      {/* Review Modal */}
+      {reviewItem && (
+        <ReviewModal
+          item={reviewItem}
+          existing={myReviews[reviewItem.id] || null}
+          onClose={() => setReviewItem(null)}
+          onSaved={handleReviewSaved}
+        />
+      )}
 
       {/* ── HERO ── */}
       <section className="hero-wrap">
@@ -146,7 +166,10 @@ const Home = () => {
           ) : (
             <div className="menu-grid">
               {filteredItems.map((dish, i) => {
-                const vegType = isVeg(dish.category);
+                const vegType      = isVeg(dish.category);
+                const ratingData   = ratings[dish.id];
+                const myReview     = myReviews[dish.id];
+
                 return (
                   <motion.div
                     key={dish.id}
@@ -163,6 +186,38 @@ const Home = () => {
                     <div className="menu-card-body">
                       <div className="menu-card-name">{dish.name}</div>
                       <div className="menu-card-cat">{dish.category}</div>
+
+                      {/* Rating row */}
+                      <div className="menu-card-rating">
+                        {ratingData ? (
+                          <>
+                            <StarRating value={Math.round(ratingData.avgRating)} readOnly size={13} />
+                            <span className="rating-text">
+                              {ratingData.avgRating.toFixed(1)} ({ratingData.count})
+                            </span>
+                          </>
+                        ) : (
+                          <span className="rating-text" style={{ opacity: 0.4 }}>
+                            <Star size={12} /> No reviews yet
+                          </span>
+                        )}
+                        {/* Review button */}
+                        <button
+                          className={`review-btn ${myReview ? 'reviewed' : ''}`}
+                          onClick={() => {
+                            if (!localStorage.getItem('token')) {
+                              toast('Login to leave a review', { icon: '🔒' });
+                              navigate('/login');
+                              return;
+                            }
+                            setReviewItem(dish);
+                          }}
+                          title={myReview ? 'Edit your review' : 'Rate this dish'}
+                        >
+                          {myReview ? '✏️ Edit' : '⭐ Rate'}
+                        </button>
+                      </div>
+
                       <div className="menu-card-footer">
                         <span className="menu-card-price">{dish.price}</span>
                         <button className="add-btn" onClick={() => handleAdd(dish)}>

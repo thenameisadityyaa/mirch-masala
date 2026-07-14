@@ -14,7 +14,8 @@ const userSchema = new mongoose.Schema(
         pincode: { type: String, default: '' },
       }
     ],
-    isAdmin: { type: Boolean, default: false },
+    isAdmin:       { type: Boolean, default: false },
+    loyaltyPoints: { type: Number,  default: 0 },
   },
   { timestamps: true }
 );
