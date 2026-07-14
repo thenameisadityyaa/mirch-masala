@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { LogOut, MapPin, Search, Menu, X } from 'lucide-react';
+import { LogOut, MapPin, Search, Menu, X, ShoppingCart } from 'lucide-react';
+import { useCart } from '../context/CartContext';
 
 const Navbar = ({ user, setUser }) => {
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { itemCount, openCart } = useCart();
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -50,16 +52,40 @@ const Navbar = ({ user, setUser }) => {
                 <Link to="/register" className="btn btn-primary">Sign Up</Link>
               </>
             )}
+
+            {/* Cart Button */}
+            <button
+              onClick={openCart}
+              className="cart-nav-btn"
+              aria-label="Open cart"
+            >
+              <ShoppingCart size={20} />
+              {itemCount > 0 && (
+                <span className="cart-badge">{itemCount > 9 ? '9+' : itemCount}</span>
+              )}
+            </button>
           </div>
 
-          {/* Mobile hamburger */}
-          <button
-            className="nav-hamburger"
-            onClick={() => setMobileOpen(o => !o)}
-            aria-label="Toggle menu"
-          >
-            {mobileOpen ? <X size={22} /> : <Menu size={22} />}
-          </button>
+          {/* Mobile: cart icon + hamburger */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <button
+              onClick={openCart}
+              className="cart-nav-btn nav-mobile-cart"
+              aria-label="Open cart"
+            >
+              <ShoppingCart size={20} />
+              {itemCount > 0 && (
+                <span className="cart-badge">{itemCount > 9 ? '9+' : itemCount}</span>
+              )}
+            </button>
+            <button
+              className="nav-hamburger"
+              onClick={() => setMobileOpen(o => !o)}
+              aria-label="Toggle menu"
+            >
+              {mobileOpen ? <X size={22} /> : <Menu size={22} />}
+            </button>
+          </div>
         </div>
 
         {/* Mobile drawer */}
@@ -74,8 +100,8 @@ const Navbar = ({ user, setUser }) => {
               <input type="text" placeholder="Search for dishes..." />
             </div>
             <div className="mobile-nav-links">
-              <Link to="/"          className="mobile-nav-link" onClick={closeMobile}>Home</Link>
-              <Link to="/track"     className="mobile-nav-link" onClick={closeMobile}>Track Order</Link>
+              <Link to="/"         className="mobile-nav-link" onClick={closeMobile}>Home</Link>
+              <Link to="/track"    className="mobile-nav-link" onClick={closeMobile}>Track Order</Link>
               {user ? (
                 <>
                   <Link to="/dashboard" className="mobile-nav-link" onClick={closeMobile}>My Orders</Link>

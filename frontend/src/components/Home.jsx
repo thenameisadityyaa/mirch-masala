@@ -1,14 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ShoppingBag, Flame, Zap, MapPin, ShieldCheck } from 'lucide-react';
-import axios from 'axios';
+import toast from 'react-hot-toast';
 import Testimonials from './Testimonials';
 import FAQ from './FAQ';
 import Footer from './Footer';
 import { menuItems } from '../data/menuItems';
-
-import { API_URL } from '../config';
+import { useCart } from '../context/CartContext';
 
 const isVeg = (cat) => {
   if (['Soup (Non Veg)', 'Pakoda (Non Veg)'].includes(cat)) return 'nonveg';
@@ -25,31 +24,29 @@ const WHY_ITEMS = [
 
 const Home = () => {
   const navigate = useNavigate();
+  const { addItem, openCart } = useCart();
   const [activeCategory, setActiveCategory] = useState('All');
   const [search, setSearch] = useState('');
 
   const categories = ['All', ...new Set(menuItems.map(item => item.category))];
 
   const filteredItems = menuItems.filter(item => {
-    const catMatch = activeCategory === 'All' || item.category === activeCategory;
+    const catMatch    = activeCategory === 'All' || item.category === activeCategory;
     const searchMatch = search === '' || item.name.toLowerCase().includes(search.toLowerCase());
     return catMatch && searchMatch;
   });
 
-  const handleOrder = async (dish) => {
+  const handleAdd = useCallback((dish) => {
     const token = localStorage.getItem('token');
-    if (!token) { navigate('/login'); return; }
-    try {
-      const res = await axios.post(`${API_URL}/orders`, {
-        items: [dish],
-        total: parseInt(dish.price.replace('₹', '')),
-        address: 'Customer Address'
-      }, { headers: { Authorization: `Bearer ${token}` } });
-      navigate(`/track/${res.data.id}`);
-    } catch {
-      alert('Could not place order. Please try again.');
+    if (!token) {
+      toast('Please login to add items to your cart', { icon: '🔒' });
+      navigate('/login');
+      return;
     }
-  };
+    addItem(dish);
+    toast.success(`${dish.name} added to cart!`, { duration: 1800 });
+    openCart();
+  }, [addItem, openCart, navigate]);
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
@@ -168,7 +165,7 @@ const Home = () => {
                       <div className="menu-card-cat">{dish.category}</div>
                       <div className="menu-card-footer">
                         <span className="menu-card-price">{dish.price}</span>
-                        <button className="add-btn" onClick={() => handleOrder(dish)}>
+                        <button className="add-btn" onClick={() => handleAdd(dish)}>
                           <ShoppingBag size={13} /> Add
                         </button>
                       </div>
