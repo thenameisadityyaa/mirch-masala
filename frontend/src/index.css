@@ -451,6 +451,8 @@ body {
 .error-text   { color: #dc2626; font-size: 0.88rem; }
 .w-full       { width: 100%; }
 
+@keyframes spin { to { transform: rotate(360deg); } }
+
 /* ─── MOBILE NAVBAR ─────────────────────────────── */
 .nav-hamburger {
   display: none;

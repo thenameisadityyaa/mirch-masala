@@ -41,6 +41,11 @@ const Navbar = ({ user, setUser }) => {
           <div className="nav-links nav-desktop-only">
             {user ? (
               <>
+                {user.isAdmin && (
+                  <Link to="/admin" className="btn btn-ghost" style={{ color: 'var(--brand)', fontWeight: 700 }}>
+                    Admin
+                  </Link>
+                )}
                 <Link to="/dashboard" className="btn btn-ghost">My Orders</Link>
                 <button onClick={handleLogout} className="btn btn-secondary">
                   <LogOut size={15} /> Logout

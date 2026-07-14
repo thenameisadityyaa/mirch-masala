@@ -13,7 +13,8 @@ import Tracker   from './components/Tracker';
 import Dashboard from './components/Dashboard';
 import Auth      from './components/Auth';
 import Checkout  from './components/Checkout';
-import NotFound  from './components/NotFound';
+import NotFound   from './components/NotFound';
+import AdminPanel from './components/AdminPanel';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -69,6 +70,7 @@ function App() {
             <Route path="/login"      element={<Auth type="login"    setUser={setUser} />} />
             <Route path="/register"   element={<Auth type="register" setUser={setUser} />} />
             <Route path="/dashboard"  element={<Dashboard user={user} />} />
+            <Route path="/admin"      element={<AdminPanel user={user} />} />
             <Route path="*"           element={<NotFound />} />
           </Routes>
         </AnimatePresence>
